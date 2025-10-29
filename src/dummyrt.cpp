@@ -300,12 +300,15 @@ void App::init(
         image.write(dispatch_id().xy(), make_float4(0.0f));
     };
 
-    Kernel2D hdr2ldr_kernel = [&](ImageFloat hdr_image, ImageFloat ldr_image, Float scale, Bool is_hdr) noexcept {
+    Kernel2D hdr2ldr_kernel = [&](ImageFloat hdr_image, ImageFloat ldr_image, Float scale, Bool is_hdr, Bool reverse_y) noexcept {
         UInt2 coord = dispatch_id().xy();
         Float4 hdr = hdr_image.read(coord);
         Float3 ldr = hdr.xyz() / hdr.w * scale;
         $if (!is_hdr) {
             ldr = linear_to_srgb(ldr);
+        };
+        $if(reverse_y) {
+            coord.y = dispatch_size().y - coord.y - 1;
         };
         ldr_image.write(coord, make_float4(ldr, 1.0f));
     };
@@ -359,6 +362,7 @@ uint64_t App::create_texture(uint width, uint height) {
         accum_image = device.create_image<float>(PixelStorage::FLOAT4, resolution);
         luisa::vector<std::array<uint8_t, 4u>> host_image(resolution.x * resolution.y);
         seed_image = device.create_image<uint>(PixelStorage::INT1, resolution);
+        cmd_list << make_sampler_shader(seed_image).dispatch(seed_image.size());
     }
 
     // resolution changed, all textures should reload
@@ -366,25 +370,37 @@ uint64_t App::create_texture(uint width, uint height) {
     return (int64_t)dummy_image.native_handle();
 }
 
-void App::handle_key(luisa::compute::Key key) {
+void App::handle_key(luisa::compute::Key key, luisa::compute::Action action) {
     if (!camera_controller.get()) { return; }
-    auto dt = static_cast<float>(delta_time / 1000.0);
+
     switch (key) {
         case KEY_W:
-            camera_controller->rotate_pitch(dt);
-            is_dirty = true;
+            if (action == Action::ACTION_PRESSED) {
+                w_pressed = true;
+            } else if (action == Action::ACTION_RELEASED) {
+                w_pressed = false;
+            }
             break;
         case KEY_A:
-            camera_controller->rotate_yaw(dt);
-            is_dirty = true;
+            if (action == Action::ACTION_PRESSED) {
+                a_pressed = true;
+            } else if (action == Action::ACTION_RELEASED) {
+                a_pressed = false;
+            }
             break;
         case KEY_S:
-            camera_controller->rotate_pitch(-dt);
-            is_dirty = true;
+            if (action == Action::ACTION_PRESSED) {
+                s_pressed = true;
+            } else if (action == Action::ACTION_RELEASED) {
+                s_pressed = false;
+            }
             break;
         case KEY_D:
-            camera_controller->rotate_yaw(-dt);
-            is_dirty = true;
+            if (action == Action::ACTION_PRESSED) {
+                d_pressed = true;
+            } else if (action == Action::ACTION_RELEASED) {
+                d_pressed = false;
+            }
             break;
         default:
             return;
@@ -392,6 +408,23 @@ void App::handle_key(luisa::compute::Key key) {
 }
 
 void App::update() {
+    auto dt = static_cast<float>(delta_time / 1000.0);
+    if (w_pressed) {
+        camera_controller->rotate_pitch(dt);
+        is_dirty = true;
+    }
+    if (s_pressed) {
+        camera_controller->rotate_pitch(-dt);
+        is_dirty = true;
+    }
+    if (a_pressed) {
+        camera_controller->rotate_yaw(dt);
+        is_dirty = true;
+    }
+    if (d_pressed) {
+        camera_controller->rotate_yaw(-dt);
+        is_dirty = true;
+    }
     // cmd_list << clear_shader(dummy_image).dispatch(resolution);
     // float2 f_res = {(float)resolution.x, (float)resolution.y};
     // cmd_list
@@ -408,7 +441,7 @@ void App::update() {
     cmd_list << accumulate_shader(accum_image, framebuffer)
                     .dispatch(resolution);
     // cmd_list << hdr2ldr_shader(accum_image, ldr_image, 1.0f, false).dispatch(resolution);
-    cmd_list << hdr2ldr_shader(accum_image, dummy_image, 1.0f, false).dispatch(resolution);
+    cmd_list << hdr2ldr_shader(accum_image, dummy_image, 1.0f, false, device.backend_name() == "dx" /*DX need reverse-z*/).dispatch(resolution);
     stream << cmd_list.commit();
 
     // Post Update

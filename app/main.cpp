@@ -102,7 +102,9 @@ struct RendererImpl : public IRenderer {
     }
     void pause() override { is_paused = true; }
     void resume() override { is_paused = false; }
-    void handle_key(luisa::compute::Key key) override { render_app->handle_key(key); }
+    void handle_key(luisa::compute::Key key, luisa::optional<luisa::compute::Action> action) override {
+        if (action) render_app->handle_key(key, *action);
+    }
     uint64_t get_present_texture(luisa::uint2 resolution) override {
         return render_app->create_texture(resolution.x, resolution.y);
     }

@@ -15,13 +15,12 @@ inline luisa::compute::Key key_map(int key) {
         default: return KEY_UNKNOWN;
     }
 }
-
 struct IRenderer {
     virtual void init(QRhiNativeHandles &) = 0;
     virtual void update() = 0;
     virtual void pause() = 0;
     virtual void resume() = 0;
-    virtual void handle_key(luisa::compute::Key key) = 0;
+    virtual void handle_key(luisa::compute::Key key, luisa::optional<luisa::compute::Action> action) = 0;
     virtual uint64_t get_present_texture(luisa::uint2 resolution) = 0;
 protected:
     ~IRenderer() = default;
@@ -48,6 +47,7 @@ protected:
     std::unique_ptr<QRhiRenderPassDescriptor> m_rp;
     bool m_hasSwapChain = false;
     QRhi::Implementation m_graphicsApi = QRhi::D3D12;
+    void keyReleaseEvent(QKeyEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;

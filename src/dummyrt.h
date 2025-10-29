@@ -103,7 +103,7 @@ struct DUMMY_API App {
     luisa::compute::Shader<2, luisa::compute::Image<float>> clear_shader;
     luisa::compute::Shader<2, luisa::compute::Image<float>, float, luisa::compute::float2> draw_shader;
     luisa::compute::Shader<2, luisa::compute::Image<float>, luisa::compute::Image<uint>, Camera, luisa::compute::Accel, luisa::uint2> raytracing_shader;
-    luisa::compute::Shader<2, luisa::compute::Image<float>, luisa::compute::Image<float>, float, bool> hdr2ldr_shader;
+    luisa::compute::Shader<2, luisa::compute::Image<float>, luisa::compute::Image<float>, float, bool, bool> hdr2ldr_shader;
     luisa::compute::Shader<2, luisa::compute::Image<float>, luisa::compute::Image<float>> accumulate_shader;
     luisa::compute::Shader<2, luisa::compute::Image<uint>> make_sampler_shader;
 
@@ -115,7 +115,11 @@ struct DUMMY_API App {
     Camera camera;
     luisa::unique_ptr<FPVCameraController> camera_controller;
     luisa::compute::Accel accel;
-    bool is_dirty;
+    bool w_pressed : 1 {false};
+    bool s_pressed : 1 {false};
+    bool a_pressed : 1 {false};
+    bool d_pressed : 1 {false};
+    bool is_dirty : 1 {true};
     void *vk_physical_device{};
     void *vk_instance{};
     uint32_t vk_queue_family_idx{};
@@ -124,7 +128,7 @@ struct DUMMY_API App {
     void init(luisa::compute::Context &ctx, const char *backend_name);
     uint64_t create_texture(uint width, uint height);
     void update();
-    void handle_key(luisa::compute::Key key);
+    void handle_key(luisa::compute::Key key, luisa::compute::Action action);
     void *init_vulkan(luisa::compute::Context &ctx);
     ~App();
 };
