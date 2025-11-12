@@ -2,7 +2,9 @@ add_rules("mode.release", "mode.debug", "mode.releasedbg")
 set_languages("c++20")
 includes("lc_options.generated.lua")
 includes(lc_dir)
+includes("ext/nanobind")
 set_config("qt", qt_path)
+
 function qt_binary_target(name)
     local bin_name = name .. "_b"
     target(name)
@@ -24,3 +26,4 @@ end
 
 includes("app")
 includes("src")
+includes("bind")

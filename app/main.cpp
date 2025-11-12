@@ -171,7 +171,8 @@ int main(int argc, char **argv) {
     inputDebugLabel->setWordWrap(true);
     mainLayout->addWidget(inputDebugLabel);
 
-    // ============ 核心模块：创建LC-Driven Viewport ===============
+    // =================================================================
+    // ============ 核心模块：创建LC-Driven Viewport Start ==============
     RhiWindow *renderWindow = new RhiWindow(graphicsApi);
     RendererImpl renderer_impl;
     renderer_impl.backend = graphicsApi;
@@ -184,7 +185,6 @@ int main(int argc, char **argv) {
         renderWindow->setVulkanInstance(&inst);
 #endif
 
-    // ============ 核心模块：创建LC-Driven Viewport ===============
     // 创建自定义容器Widget来转发事件
     WindowContainerWidget *renderContainerWrapper = new WindowContainerWidget(renderWindow, &mainWindow);
     renderContainerWrapper->setMinimumSize(800, 600);
@@ -200,103 +200,108 @@ int main(int argc, char **argv) {
 
     // 设置初始焦点
     renderContainerWrapper->setFocus();
-    // ============ 核心模块：创建LC-Driven Viewport ===============
+    // ============ 核心模块：创建LC-Driven Viewport Done ===============
+    // =================================================================
+
     mainLayout->addWidget(renderContainerWrapper);
 
-    // 底部控制面板
-    QGroupBox *controlGroup = new QGroupBox("Render Controls");
-    QHBoxLayout *controlLayout = new QHBoxLayout(controlGroup);
+    // 调试信息
+    {
+        // 底部控制面板
+        QGroupBox *controlGroup = new QGroupBox("Render Controls");
+        QHBoxLayout *controlLayout = new QHBoxLayout(controlGroup);
 
-    // 左侧按钮组
-    QVBoxLayout *buttonLayout = new QVBoxLayout();
-    QPushButton *startButton = new QPushButton("Start Render");
-    startButton->setEnabled(false);// 示例：默认已经在渲染
-    QPushButton *pauseButton = new QPushButton("Pause Render");
-    QObject::connect(pauseButton, &QPushButton::pressed, [renderWindow]() {
-        renderWindow->renderer->pause();
-    });
-    QPushButton *resumeButton = new QPushButton("Resume Render");
-    QObject::connect(resumeButton, &QPushButton::pressed, [renderWindow]() {
-        renderWindow->renderer->resume();
-    });
-    buttonLayout->addWidget(startButton);
-    buttonLayout->addWidget(pauseButton);
-    buttonLayout->addWidget(resumeButton);
-    buttonLayout->addStretch();
+        // 左侧按钮组
+        QVBoxLayout *buttonLayout = new QVBoxLayout();
+        QPushButton *startButton = new QPushButton("Start Render");
+        startButton->setEnabled(false);// 示例：默认已经在渲染
+        QPushButton *pauseButton = new QPushButton("Pause Render");
+        QObject::connect(pauseButton, &QPushButton::pressed, [renderWindow]() {
+            renderWindow->renderer->pause();
+        });
+        QPushButton *resumeButton = new QPushButton("Resume Render");
+        QObject::connect(resumeButton, &QPushButton::pressed, [renderWindow]() {
+            renderWindow->renderer->resume();
+        });
+        buttonLayout->addWidget(startButton);
+        buttonLayout->addWidget(pauseButton);
+        buttonLayout->addWidget(resumeButton);
+        buttonLayout->addStretch();
 
-    controlLayout->addLayout(buttonLayout);
+        controlLayout->addLayout(buttonLayout);
 
-    // 中间参数控制
-    QVBoxLayout *paramLayout = new QVBoxLayout();
+        // 中间参数控制
+        QVBoxLayout *paramLayout = new QVBoxLayout();
 
-    QHBoxLayout *sampleLayout = new QHBoxLayout();
-    QLabel *sampleLabel = new QLabel("Samples:");
-    QSlider *sampleSlider = new QSlider(Qt::Horizontal);
-    sampleSlider->setRange(1, 100);
-    sampleSlider->setValue(50);
-    QLabel *sampleValueLabel = new QLabel("50");
-    sampleLayout->addWidget(sampleLabel);
-    sampleLayout->addWidget(sampleSlider);
-    sampleLayout->addWidget(sampleValueLabel);
+        QHBoxLayout *sampleLayout = new QHBoxLayout();
+        QLabel *sampleLabel = new QLabel("Samples:");
+        QSlider *sampleSlider = new QSlider(Qt::Horizontal);
+        sampleSlider->setRange(1, 100);
+        sampleSlider->setValue(50);
+        QLabel *sampleValueLabel = new QLabel("50");
+        sampleLayout->addWidget(sampleLabel);
+        sampleLayout->addWidget(sampleSlider);
+        sampleLayout->addWidget(sampleValueLabel);
 
-    QHBoxLayout *bounceLayout = new QHBoxLayout();
-    QLabel *bounceLabel = new QLabel("Max Bounce:");
-    QSlider *bounceSlider = new QSlider(Qt::Horizontal);
-    bounceSlider->setRange(1, 10);
-    bounceSlider->setValue(5);
-    QLabel *bounceValueLabel = new QLabel("5");
-    bounceLayout->addWidget(bounceLabel);
-    bounceLayout->addWidget(bounceSlider);
-    bounceLayout->addWidget(bounceValueLabel);
+        QHBoxLayout *bounceLayout = new QHBoxLayout();
+        QLabel *bounceLabel = new QLabel("Max Bounce:");
+        QSlider *bounceSlider = new QSlider(Qt::Horizontal);
+        bounceSlider->setRange(1, 10);
+        bounceSlider->setValue(5);
+        QLabel *bounceValueLabel = new QLabel("5");
+        bounceLayout->addWidget(bounceLabel);
+        bounceLayout->addWidget(bounceSlider);
+        bounceLayout->addWidget(bounceValueLabel);
 
-    paramLayout->addLayout(sampleLayout);
-    paramLayout->addLayout(bounceLayout);
+        paramLayout->addLayout(sampleLayout);
+        paramLayout->addLayout(bounceLayout);
 
-    controlLayout->addLayout(paramLayout);
+        controlLayout->addLayout(paramLayout);
 
-    // 右侧统计信息
-    QVBoxLayout *statsLayout = new QVBoxLayout();
-    QLabel *fpsLabel = new QLabel("FPS: 60");
-    QLabel *frameTimeLabel = new QLabel("Frame Time: 16.6ms");
-    QLabel *resolutionLabel = new QLabel("Resolution: 1280x720");
-    statsLayout->addWidget(fpsLabel);
-    statsLayout->addWidget(frameTimeLabel);
-    statsLayout->addWidget(resolutionLabel);
-    statsLayout->addStretch();
+        // 右侧统计信息
+        QVBoxLayout *statsLayout = new QVBoxLayout();
+        QLabel *fpsLabel = new QLabel("FPS: 60");
+        QLabel *frameTimeLabel = new QLabel("Frame Time: 16.6ms");
+        QLabel *resolutionLabel = new QLabel("Resolution: 1280x720");
+        statsLayout->addWidget(fpsLabel);
+        statsLayout->addWidget(frameTimeLabel);
+        statsLayout->addWidget(resolutionLabel);
+        statsLayout->addStretch();
 
-    controlLayout->addLayout(statsLayout);
+        controlLayout->addLayout(statsLayout);
 
-    mainLayout->addWidget(controlGroup);
+        mainLayout->addWidget(controlGroup);
 
-    // 底部状态栏
-    QHBoxLayout *bottomLayout = new QHBoxLayout();
-    QLabel *apiLabel = new QLabel(QString("API: %1").arg(renderWindow->graphicsApiName()));
-    QLabel *deviceLabel = new QLabel("Device: GPU 0");
-    bottomLayout->addWidget(apiLabel);
-    bottomLayout->addStretch();
-    bottomLayout->addWidget(deviceLabel);
+        // 底部状态栏
+        QHBoxLayout *bottomLayout = new QHBoxLayout();
+        QLabel *apiLabel = new QLabel(QString("API: %1").arg(renderWindow->graphicsApiName()));
+        QLabel *deviceLabel = new QLabel("Device: GPU 0");
+        bottomLayout->addWidget(apiLabel);
+        bottomLayout->addStretch();
+        bottomLayout->addWidget(deviceLabel);
 
-    mainLayout->addLayout(bottomLayout);
+        mainLayout->addLayout(bottomLayout);
 
-    // 连接Slider和Label的信号槽
-    QObject::connect(sampleSlider, &QSlider::valueChanged, [sampleValueLabel](int value) {
-        sampleValueLabel->setText(QString::number(value));
-    });
+        // 连接Slider和Label的信号槽
+        QObject::connect(sampleSlider, &QSlider::valueChanged, [sampleValueLabel](int value) {
+            sampleValueLabel->setText(QString::number(value));
+        });
 
-    QObject::connect(bounceSlider, &QSlider::valueChanged, [bounceValueLabel](int value) {
-        bounceValueLabel->setText(QString::number(value));
-    });
+        QObject::connect(bounceSlider, &QSlider::valueChanged, [bounceValueLabel](int value) {
+            bounceValueLabel->setText(QString::number(value));
+        });
 
-    // 连接RhiWindow的输入事件信号到UI标签
-    QObject::connect(renderWindow, &RhiWindow::keyPressed, [inputDebugLabel](const QString &keyInfo) {
-        inputDebugLabel->setText(QString("Input Events: %1").arg(keyInfo));
-        inputDebugLabel->setStyleSheet("QLabel { background-color: #d4edda; padding: 5px; border: 1px solid #28a745; color: #155724; }");
-    });
+        // 连接RhiWindow的输入事件信号到UI标签
+        QObject::connect(renderWindow, &RhiWindow::keyPressed, [inputDebugLabel](const QString &keyInfo) {
+            inputDebugLabel->setText(QString("Input Events: %1").arg(keyInfo));
+            inputDebugLabel->setStyleSheet("QLabel { background-color: #d4edda; padding: 5px; border: 1px solid #28a745; color: #155724; }");
+        });
 
-    QObject::connect(renderWindow, &RhiWindow::mouseClicked, [inputDebugLabel](const QString &mouseInfo) {
-        inputDebugLabel->setText(QString("Input Events: %1").arg(mouseInfo));
-        inputDebugLabel->setStyleSheet("QLabel { background-color: #d1ecf1; padding: 5px; border: 1px solid #17a2b8; color: #0c5460; }");
-    });
+        QObject::connect(renderWindow, &RhiWindow::mouseClicked, [inputDebugLabel](const QString &mouseInfo) {
+            inputDebugLabel->setText(QString("Input Events: %1").arg(mouseInfo));
+            inputDebugLabel->setStyleSheet("QLabel { background-color: #d1ecf1; padding: 5px; border: 1px solid #17a2b8; color: #0c5460; }");
+        });
+    }
 
     // 显示主窗口
     mainWindow.show();

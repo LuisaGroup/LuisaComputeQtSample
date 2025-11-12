@@ -3,6 +3,7 @@
 #include <QOffscreenSurface>
 #include <rhi/qrhi.h>
 #include "dummyrt.h"
+
 #include <luisa/gui/input.h>
 
 inline luisa::compute::Key key_map(int key) {

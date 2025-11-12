@@ -18,3 +18,4 @@ target("dummyrt")
     add_defines("DUMMY_DLL_EXPORTS")
     add_files("dummyrt.cpp")
 target_end()
+

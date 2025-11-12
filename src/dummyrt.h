@@ -126,5 +126,6 @@ struct DUMMY_API App {
     void update();
     void handle_key(luisa::compute::Key key);
     void *init_vulkan(luisa::compute::Context &ctx);
+
     ~App();
 };
