@@ -19,6 +19,11 @@ NB_MODULE(lc_engine_ext, m) {
             .def("create_texture", &App::create_texture)
             .def("update", &App::update)
             .def("handle_key", &App::handle_key)
+            .def("GetDeviceNativeHandle", &App::GetDeviceNativeHandle)
+            .def("GetVkPhysicalDevice", &App::GetVkPhysicalDevice)
+            .def("GetDxAdapterLuidHigh", &App::GetDxAdapterLuidHigh)
+            .def("GetDxAdapterLuidLow", &App::GetDxAdapterLuidLow)
+            .def("GetStreamNativeHandle", &App::GetStreamNativeHandle)
             .def("init_vulkan", &App::init_vulkan);
 
     if (!nb::type<App>().is(cls))

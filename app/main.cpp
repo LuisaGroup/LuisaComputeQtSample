@@ -82,16 +82,16 @@ struct RendererImpl : public IRenderer {
     void init(QRhiNativeHandles &handles_base) override {
         if (backend == QRhi::D3D12) {
             auto &handles = static_cast<QRhiD3D12NativeHandles &>(handles_base);
-            handles.dev = render_app->device.native_handle();
+            handles.dev = render_app->GetDeviceNativeHandle();
             handles.minimumFeatureLevel = 0;
-            handles.adapterLuidHigh = render_app->dx_adaptor_luid.x;
-            handles.adapterLuidLow = render_app->dx_adaptor_luid.y;
-            handles.commandQueue = render_app->stream.native_handle();
+            handles.adapterLuidHigh = render_app->GetDxAdapterLuidHigh();
+            handles.adapterLuidLow = render_app->GetDxAdapterLuidLow();
+            handles.commandQueue = render_app->GetStreamNativeHandle();
         } else if (backend == QRhi::Vulkan) {
             auto &handles = static_cast<QRhiVulkanNativeHandles &>(handles_base);
-            handles.physDev = (VkPhysicalDevice)render_app->vk_physical_device;
-            handles.dev = (VkDevice)render_app->device.native_handle();
-            handles.gfxQueue = (VkQueue)render_app->stream.native_handle();
+            handles.physDev = (VkPhysicalDevice)render_app->GetVkPhysicalDevice();
+            handles.dev = (VkDevice)render_app->GetDeviceNativeHandle();
+            handles.gfxQueue = (VkQueue)render_app->GetStreamNativeHandle();
         } else {
             qFatal("Backend unsupported.");
         }

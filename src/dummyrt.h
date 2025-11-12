@@ -126,6 +126,13 @@ public:     // interface
     App() {}// empty constructor
     void create_context(const char *workspace_path);
     void init(const char *backend_name);
+
+    void *GetDeviceNativeHandle() { return device.native_handle(); }
+    void *GetVkPhysicalDevice() { return vk_physical_device; }
+    int32_t GetDxAdapterLuidHigh() { return dx_adaptor_luid.x; }
+    int32_t GetDxAdapterLuidLow() { return dx_adaptor_luid.y; }
+    void *GetStreamNativeHandle() { return stream.native_handle(); }
+
     uint64_t create_texture(uint width, uint height);
     void update();
     void handle_key(int key);
