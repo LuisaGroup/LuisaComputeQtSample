@@ -457,9 +457,10 @@ App::~App() {
 }
 void *App::init_vulkan(luisa::compute::Context &ctx) {
     auto const &vk_backend = ctx.load_backend("vk");
-    return vk_backend.invoke<void *(bool enable_validation, const luisa::string *extra_instance_exts, size_t extra_instance_ext_count, const char *custom_vk_lib_path, const char *custom_vk_lib_name)>(
+    bool enable_surface = true;
+    return vk_backend.invoke<void *(bool enable_validation, bool& enable_surface, const luisa::string *extra_instance_exts, size_t extra_instance_ext_count, const char *custom_vk_lib_path, const char *custom_vk_lib_name)>(
         "init_vk_instance",
-        false,
+        false, enable_surface,
         nullptr, 0,
         nullptr, nullptr);
 }
