@@ -127,11 +127,11 @@ public:     // interface
     void create_context(const char *workspace_path);
     void init(const char *backend_name);
 
-    void *GetDeviceNativeHandle() { return device.native_handle(); }
+    int64_t GetDeviceNativeHandle() { return (int64_t)device.native_handle(); }
     void *GetVkPhysicalDevice() { return vk_physical_device; }
     int32_t GetDxAdapterLuidHigh() { return dx_adaptor_luid.x; }
     int32_t GetDxAdapterLuidLow() { return dx_adaptor_luid.y; }
-    void *GetStreamNativeHandle() { return stream.native_handle(); }
+    int64_t GetStreamNativeHandle() { return (int64_t)stream.native_handle(); }
 
     uint64_t create_texture(uint width, uint height);
     void update();

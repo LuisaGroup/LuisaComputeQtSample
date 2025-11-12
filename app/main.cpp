@@ -82,11 +82,11 @@ struct RendererImpl : public IRenderer {
     void init(QRhiNativeHandles &handles_base) override {
         if (backend == QRhi::D3D12) {
             auto &handles = static_cast<QRhiD3D12NativeHandles &>(handles_base);
-            handles.dev = render_app->GetDeviceNativeHandle();
+            handles.dev = (void *)render_app->GetDeviceNativeHandle();
             handles.minimumFeatureLevel = 0;
             handles.adapterLuidHigh = render_app->GetDxAdapterLuidHigh();
             handles.adapterLuidLow = render_app->GetDxAdapterLuidLow();
-            handles.commandQueue = render_app->GetStreamNativeHandle();
+            handles.commandQueue = (void *)render_app->GetStreamNativeHandle();
         } else if (backend == QRhi::Vulkan) {
             auto &handles = static_cast<QRhiVulkanNativeHandles &>(handles_base);
             handles.physDev = (VkPhysicalDevice)render_app->GetVkPhysicalDevice();
@@ -103,8 +103,8 @@ struct RendererImpl : public IRenderer {
     void pause() override { is_paused = true; }
     void resume() override { is_paused = false; }
     void handle_key(luisa::compute::Key key) override { render_app->handle_key(key); }
-    uint64_t get_present_texture(luisa::uint2 resolution) override {
-        return render_app->create_texture(resolution.x, resolution.y);
+    uint64_t get_present_texture(int InWidth, int InHeight) override {
+        return render_app->create_texture(InWidth, InHeight);
     }
 };
 

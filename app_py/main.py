@@ -1,8 +1,8 @@
 import sys
 import os
 
-dll_file = os.path.abspath("build/windows/x64/release/")
-sys.path.append(dll_file)
+dll_path = os.path.abspath("build/windows/x64/release/")
+sys.path.append(dll_path)
 
 try:
     import lc_engine_ext
@@ -12,7 +12,7 @@ except:
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtGui import QGuiApplication, QRhi, QSurfaceFormat, QRhiNativeHandles
 
-from rhi_window import HelloWindow, IRenderer
+from rhi_window import HelloWindow
 import rhi_window_rc  # noqa: F401
 
 
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     render_app = lc_engine_ext.App()
     print(render_app.__doc__)
-    render_app.create_context(sys.argv[0])
+    render_app.create_context(dll_path)
     backend = "dx"
     render_app.init(backend)
 

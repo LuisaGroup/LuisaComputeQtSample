@@ -1,6 +1,6 @@
 import numpy
 import sys
-
+import ctypes
 
 from PySide6.QtCore import (
     QEvent,
@@ -184,8 +184,14 @@ class RhiWindow(QWindow):
             handles = QRhiD3D12NativeHandles()
             params = QRhiD3D12InitParams()
             params.enableDebugLayer = False
-            handles.dev = self.render_app
-            self.m_rhi = QRhi.create(QRhi.Implementation.D3D12, params)
+            # handles.dev = ctypes.c_void_p(self.render_app.GetDeviceNativeHandle())
+            handles.minimumFeatureLevel = 0
+            handles.adapterLuidHigh = self.render_app.GetDxAdapterLuidHigh()
+            handles.adapterLuidLow = self.render_app.GetDxAdapterLuidLow()
+            # handles.commandQueue = ctypes.c_void_p(self.render_app.GetStreamNativeHandle())
+
+            flag = QRhi.Flag()
+            self.m_rhi = QRhi.create(QRhi.Implementation.D3D12, params, flag, handles)
 
         if not self.m_rhi:
             qFatal("Failed to create RHI backend")
@@ -262,8 +268,8 @@ class RhiWindow(QWindow):
 
 
 class HelloWindow(RhiWindow):
-    def __init__(self, graphicsApi):
-        super().__init__(graphicsApi)
+    def __init__(self, graphicsApi, render_app):
+        super().__init__(graphicsApi, render_app)
         self.m_vbuf = None
         self.m_ubuf = None
         self.m_texture = None
@@ -286,32 +292,9 @@ class HelloWindow(RhiWindow):
             self.m_texture = self.m_rhi.newTexture(QRhiTexture.Format.RGBA8, pixelSize)
         else:
             self.m_texture.setPixelSize(pixelSize)
+
+        handle = self.render_app.create_texture(pixelSize.width(), pixelSize.height)
         self.m_texture.create()
-        image = QImage(pixelSize, QImage.Format.Format_RGBA8888_Premultiplied)
-        with QPainter(image) as painter:
-            painter.fillRect(
-                QRectF(QPointF(0, 0), pixelSize), QColor.fromRgbF(0.4, 0.7, 0.0, 1.0)
-            )
-            painter.setPen(Qt.GlobalColor.transparent)
-            painter.setBrush(QGradient(QGradient.Preset.DeepBlue))
-            painter.drawRoundedRect(
-                QRectF(QPointF(20, 20), pixelSize - QSize(40, 40)), 16, 16
-            )
-            painter.setPen(Qt.GlobalColor.black)
-            font = QFont()
-            font.setPixelSize(0.05 * min(pixelSize.width(), pixelSize.height()))
-            painter.setFont(font)
-            name = self.graphicsApiName()
-            t = (
-                f"Rendering with QRhi to a resizable QWindow.\nThe 3D API is {name}."
-                "\nUse the command-line options to choose a different API."
-            )
-            painter.drawText(QRectF(QPointF(60, 60), pixelSize - QSize(120, 120)), 0, t)
-
-        if self.m_rhi.isYUpInNDC():
-            image = image.mirrored()
-
-        u.uploadTexture(self.m_texture, image)
 
     def customInit(self):
         self.m_initialUpdates = self.m_rhi.nextResourceUpdateBatch()
