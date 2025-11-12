@@ -224,10 +224,11 @@ void RhiWindow::ensureFullscreenTexture(const QSize &pixelSize, QRhiResourceUpda
     m_texture->createFrom({handle, m_graphicsApi == QRhi::Vulkan ? 1 : 0});
 }
 
+
 void RhiWindow::keyPressEvent(QKeyEvent *event) {
     QString keyName;
     // Handle Key Event
-    renderer->handle_key(key_map(event->key()));
+    renderer->handle_key(key_map(event->key()), luisa::compute::Action::ACTION_PRESSED);
 
     // Debug Info handler
     switch (event->key()) {
@@ -251,6 +252,39 @@ void RhiWindow::keyPressEvent(QKeyEvent *event) {
     }
 
     QString keyInfo = QString("Key Pressed: %1 (code: %2)").arg(keyName).arg(event->key());
+    qInfo() << keyInfo;
+    emit keyPressed(keyInfo);
+
+    // Root Window Handler
+    QWindow::keyPressEvent(event);
+}
+void RhiWindow::keyReleaseEvent(QKeyEvent *event) {
+    QString keyName;
+    // Handle Key Event
+    renderer->handle_key(key_map(event->key()), luisa::compute::Action::ACTION_RELEASED);
+
+    // Debug Info handler
+    switch (event->key()) {
+        case Qt::Key_W: {
+            keyName = "W";
+            break;
+        }
+        case Qt::Key_A: {
+            keyName = "A";
+            break;
+        }
+        case Qt::Key_S: {
+            keyName = "S";
+            break;
+        }
+        case Qt::Key_D: {
+            keyName = "D";
+            break;
+        }
+        default: keyName = QString("Key(%1)").arg(event->key()); break;
+    }
+
+    QString keyInfo = QString("Key Released: %1 (code: %2)").arg(keyName).arg(event->key());
     qInfo() << keyInfo;
     emit keyPressed(keyInfo);
 
