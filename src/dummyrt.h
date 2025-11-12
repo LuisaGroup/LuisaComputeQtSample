@@ -86,7 +86,7 @@ public:
 };
 
 struct DUMMY_API App {
-    luisa::unique_ptr<luisa::compute::Context> ctx;
+    luisa::optional<luisa::compute::Context> ctx;
     luisa::compute::Device device;
     luisa::compute::Stream stream;
     luisa::compute::CommandList cmd_list;
@@ -142,4 +142,5 @@ public:     // interface
     void handle_key(luisa::compute::Key key, luisa::compute::Action action);
     void *init_vulkan(luisa::compute::Context &ctx);
     ~App();
+    [[nodiscard]] luisa::compute::Context &lc_context() { return *ctx; }
 };

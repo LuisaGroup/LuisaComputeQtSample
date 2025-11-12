@@ -29,7 +29,7 @@ LUISA_STRUCT(Camera, position, front, up, right, fov) {
 };
 // clang-format on
 void App::create_context(const char *workspace_path) {
-    ctx = luisa::make_unique<luisa::compute::Context>(workspace_path);
+    ctx.emplace(workspace_path);
 }
 
 void App::init(

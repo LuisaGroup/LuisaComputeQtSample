@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
 #if QT_CONFIG(vulkan)
     QVulkanInstance inst;
     if (graphicsApi == QRhi::Vulkan) {
-        inst.setVkInstance(static_cast<VkInstance>(render_app.init_vulkan()));
+        inst.setVkInstance(static_cast<VkInstance>(render_app.init_vulkan(render_app.lc_context())));
         if (!inst.create()) {
             LUISA_ERROR("Vulkan init failed.");
         }
