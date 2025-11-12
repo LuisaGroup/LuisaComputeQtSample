@@ -93,7 +93,7 @@ struct RendererImpl : public IRenderer {
             handles.dev = (VkDevice)render_app->device.native_handle();
             handles.gfxQueue = (VkQueue)render_app->stream.native_handle();
         } else {
-            LUISA_ERROR("Backend unsupported.");
+            qFatal("Backend unsupported.");
         }
     }
     void update() override {
@@ -113,8 +113,8 @@ int main(int argc, char **argv) {
     if (argc < 2) {
         qInfo("use 'rhi_window_sample dx/vk/metal' to select backend");
     }
-    luisa::compute::Context ctx{argv[0]};
     App render_app;
+    render_app.create_context(argv[0]);
     luisa::string backend = argv[1];
     QApplication app(argc, argv);
     QRhi::Implementation graphicsApi;
@@ -131,14 +131,14 @@ int main(int argc, char **argv) {
 #if QT_CONFIG(vulkan)
     QVulkanInstance inst;
     if (graphicsApi == QRhi::Vulkan) {
-        inst.setVkInstance(static_cast<VkInstance>(render_app.init_vulkan(ctx)));
+        inst.setVkInstance(static_cast<VkInstance>(render_app.init_vulkan()));
         if (!inst.create()) {
             LUISA_ERROR("Vulkan init failed.");
         }
     }
 #endif
     // Init renderer
-    render_app.init(ctx, backend.c_str());
+    render_app.init(backend.c_str());
     // 创建主窗口容器
     QWidget mainWindow;
     mainWindow.setWindowTitle("LuisaCompute Qt Sample");

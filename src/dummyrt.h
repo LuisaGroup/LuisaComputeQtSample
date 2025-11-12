@@ -86,6 +86,7 @@ public:
 };
 
 struct DUMMY_API App {
+    luisa::unique_ptr<luisa::compute::Context> ctx;
     luisa::compute::Device device;
     luisa::compute::Stream stream;
     luisa::compute::CommandList cmd_list;
@@ -121,11 +122,14 @@ struct DUMMY_API App {
     uint32_t vk_queue_family_idx{};
     luisa::uint2 dx_adaptor_luid;
 
-    void init(luisa::compute::Context &ctx, const char *backend_name);
+public:     // interface
+    App() {}// empty constructor
+    void create_context(const char *workspace_path);
+    void init(const char *backend_name);
     uint64_t create_texture(uint width, uint height);
     void update();
-    void handle_key(luisa::compute::Key key);
-    void *init_vulkan(luisa::compute::Context &ctx);
+    void handle_key(int key);
+    void *init_vulkan();
 
     ~App();
 };

@@ -28,9 +28,12 @@ LUISA_STRUCT(Camera, position, front, up, right, fov) {
     }
 };
 // clang-format on
+void App::create_context(const char *workspace_path) {
+    ctx = luisa::make_unique<luisa::compute::Context>(workspace_path);
+}
 
 void App::init(
-    luisa::compute::Context &ctx, const char *backend_name) {
+    const char *backend_name) {
     luisa::string_view backend = backend_name;
     bool gpu_dump;
 #ifdef NDEBUG
@@ -55,7 +58,7 @@ void App::init(
     }
 #endif
     device_config_ext = device_config.extension.get();
-    device = ctx.create_device(backend, &device_config);
+    device = ctx->create_device(backend, &device_config);
 #ifdef LUISA_QT_SAMPLE_ENABLE_DX
     void *native_device;
     if (backend == "dx") {
@@ -366,7 +369,9 @@ uint64_t App::create_texture(uint width, uint height) {
     return (int64_t)dummy_image.native_handle();
 }
 
-void App::handle_key(luisa::compute::Key key) {
+void App::handle_key(int _key) {
+    luisa::compute::Key key = static_cast<luisa::compute::Key>(key);
+
     if (!camera_controller.get()) { return; }
     auto dt = static_cast<float>(delta_time / 1000.0);
     switch (key) {
@@ -422,8 +427,8 @@ App::~App() {
     camera_controller.reset();
     stream.synchronize();
 }
-void *App::init_vulkan(luisa::compute::Context &ctx) {
-    auto const &vk_backend = ctx.load_backend("vk");
+void *App::init_vulkan() {
+    auto const &vk_backend = ctx->load_backend("vk");
     return vk_backend.invoke<void *(bool enable_validation, const luisa::string *extra_instance_exts, size_t extra_instance_ext_count, const char *custom_vk_lib_path, const char *custom_vk_lib_name)>(
         "init_vk_instance",
         false,
