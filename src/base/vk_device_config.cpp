@@ -5,6 +5,9 @@
 #include <luisa/runtime/image.h>
 VkDeviceConfig::VkDeviceConfig() {}
 VkDeviceConfig::~VkDeviceConfig() {}
+void VkDeviceConfig::init_volk(PFN_vkGetInstanceProcAddr handler) noexcept {
+    volkInitializeCustom(handler);
+}
 void VkDeviceConfig::readback_vulkan_device(
     VkInstance instance,
     VkPhysicalDevice physical_device,
@@ -33,7 +36,9 @@ void VkDeviceConfig::readback_vulkan_device(
     this->graphics_queue_family_index = graphics_queue_family_index;
     this->compute_queue_family_index = compute_queue_family_index;
     this->copy_queue_family_index = copy_queue_family_index;
+    volkLoadInstance(instance);
 }
+
 luisa::unique_ptr<luisa::compute::DeviceConfigExt> make_vk_device_config(
     void *device,
     void *vk_instance,

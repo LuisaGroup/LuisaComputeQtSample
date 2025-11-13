@@ -49,4 +49,5 @@ struct VkDeviceConfig : public VulkanDeviceConfigExt {
         IDxcLibrary *dxc_library,
         IDxcUtils *dxc_utils) noexcept override;
     void *device_feature_settings() noexcept override;
+    void init_volk(PFN_vkGetInstanceProcAddr handler) noexcept override;
 };
