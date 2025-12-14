@@ -221,7 +221,7 @@ void RhiWindow::ensureFullscreenTexture(const QSize &pixelSize, QRhiResourceUpda
         m_texture->setPixelSize(pixelSize);
 
     uint64_t handle = renderer->get_present_texture(luisa::uint2(pixelSize.width(), pixelSize.height()));
-    m_texture->createFrom({handle, m_graphicsApi == QRhi::Vulkan ? 1 : 0});
+    m_texture->createFrom({handle, m_graphicsApi == QRhi::Vulkan ? 5 : 128});
 }
 
 

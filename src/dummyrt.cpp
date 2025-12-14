@@ -310,7 +310,7 @@ void App::init(
         $if (!is_hdr) {
             ldr = linear_to_srgb(ldr);
         };
-        $if(reverse_y) {
+        $if (reverse_y) {
             coord.y = dispatch_size().y - coord.y - 1;
         };
         ldr_image.write(coord, make_float4(ldr, 1.0f));
@@ -361,6 +361,7 @@ uint64_t App::create_texture(uint width, uint height) {
     }
     if (!dummy_image) {
         dummy_image = device.create_image<float>(PixelStorage::BYTE4, width, height);
+        dummy_image.set_name("Dummy-image");
         framebuffer = device.create_image<float>(PixelStorage::HALF4, resolution);
         accum_image = device.create_image<float>(PixelStorage::FLOAT4, resolution);
         luisa::vector<std::array<uint8_t, 4u>> host_image(resolution.x * resolution.y);
@@ -411,6 +412,13 @@ void App::handle_key(luisa::compute::Key key, luisa::compute::Action action) {
 }
 
 void App::update() {
+    // Post Update
+    if (device.backend_name() == "dx") {
+        set_dx12_resource_state(device_config_ext, Argument::Texture{dummy_image.handle(), 0}, D3D12EnhancedResourceUsageType::RasterRead);
+    } else {
+        // clear_vk_resource_state(device_config_ext);
+        set_vk_resource_state(device_config_ext, Argument::Texture{dummy_image.handle(), 0}, VkResourceUsageType::RasterRead);
+    }
     auto dt = static_cast<float>(delta_time / 1000.0);
     if (w_pressed) {
         camera_controller->rotate_pitch(dt);
@@ -446,13 +454,8 @@ void App::update() {
     // cmd_list << hdr2ldr_shader(accum_image, ldr_image, 1.0f, false).dispatch(resolution);
     cmd_list << hdr2ldr_shader(accum_image, dummy_image, 1.0f, false, device.backend_name() == "dx" /*DX need reverse-z*/).dispatch(resolution);
     stream << cmd_list.commit();
-
-    // Post Update
-    if (device.backend_name() == "dx") {
-        set_dx_before_state(device_config_ext, Argument::Texture{dummy_image.handle(), 0}, D3D12EnhancedResourceUsageType::RasterRead);
-    } else {
-        set_vk_before_state(device_config_ext, Argument::Texture{dummy_image.handle(), 0}, VkResourceUsageType::RasterRead);
-    }
+    stream.synchronize();
+    int x = 0;
 }
 App::~App() {
     camera_controller.reset();
@@ -461,7 +464,7 @@ App::~App() {
 void *App::init_vulkan(luisa::compute::Context &ctx) {
     auto const &vk_backend = ctx.load_backend("vk");
     bool enable_surface = true;
-    return vk_backend.invoke<void *(bool enable_validation, bool& enable_surface, const luisa::string *extra_instance_exts, size_t extra_instance_ext_count, const char *custom_vk_lib_path, const char *custom_vk_lib_name)>(
+    return vk_backend.invoke<void *(bool enable_validation, bool &enable_surface, const luisa::string *extra_instance_exts, size_t extra_instance_ext_count, const char *custom_vk_lib_path, const char *custom_vk_lib_name)>(
         "init_vk_instance",
         false, enable_surface,
         nullptr, 0,

@@ -62,8 +62,12 @@ void get_vk_device(
     vk_instance = ptr->instance;
     gfx_queue_family_index = ptr->graphics_queue_family_index;
 }
-
-void set_vk_before_state(
+void clear_vk_resource_state(luisa::compute::DeviceConfigExt *device_config_ext) {
+    auto ptr = static_cast<VkDeviceConfig *>(device_config_ext);
+    ptr->resource_after_states.clear();
+    ptr->resource_before_states.clear();
+}
+void set_vk_resource_state(
     luisa::compute::DeviceConfigExt *device_config_ext,
     luisa::variant<
         luisa::compute::Argument::Buffer,
@@ -73,6 +77,10 @@ void set_vk_before_state(
     auto ptr = static_cast<VkDeviceConfig *>(device_config_ext);
     ptr->resource_before_states.clear();
     ptr->resource_before_states.emplace_back(
+        resource,
+        (VKCustomCmd::ResourceUsageType)resource_type);
+    ptr->resource_after_states.clear();
+    ptr->resource_after_states.emplace_back(
         resource,
         (VKCustomCmd::ResourceUsageType)resource_type);
 }

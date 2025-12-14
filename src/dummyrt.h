@@ -135,7 +135,9 @@ public:     // interface
     void *GetVkPhysicalDevice() { return vk_physical_device; }
     int32_t GetDxAdapterLuidHigh() { return dx_adaptor_luid.x; }
     int32_t GetDxAdapterLuidLow() { return dx_adaptor_luid.y; }
-    int64_t GetStreamNativeHandle() { return (int64_t)stream.native_handle(); }
+    int64_t GetStreamNativeHandle() { 
+        return (int64_t)stream.native_handle(); 
+    }
 
     uint64_t create_texture(uint width, uint height);
     void update();

@@ -16,6 +16,7 @@ public:
     ID3D12DescriptorHeap *shaderDescriptor{};
     ID3D12DescriptorHeap *samplerDescriptor{};
     luisa::vector<DXCustomCmd::EnhancedResourceUsage> resource_before_states;
+    luisa::vector<DXCustomCmd::EnhancedResourceUsage> resource_after_states;
     bool gpu_dump = false;
     DXDeviceConfig(
         ID3D12Device *device)
@@ -46,5 +47,8 @@ public:
     }
     luisa::span<DXCustomCmd::EnhancedResourceUsage const> before_states(uint64_t stream_handle) noexcept override {
         return resource_before_states;
+    }
+    luisa::span<DXCustomCmd::EnhancedResourceUsage const> after_states(uint64_t stream_handle) noexcept override {
+        return resource_after_states;
     }
 };

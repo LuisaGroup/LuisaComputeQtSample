@@ -20,6 +20,7 @@ struct VkDeviceConfig : public VulkanDeviceConfigExt {
     IDxcLibrary *dxc_library{};
     IDxcUtils *dxc_utils{};
     luisa::vector<VKCustomCmd::ResourceUsage> resource_before_states;
+    luisa::vector<VKCustomCmd::ResourceUsage> resource_after_states;
     VkPhysicalDeviceMultiviewFeatures multiview_features;
     VkDeviceConfig();
     ~VkDeviceConfig();
@@ -28,6 +29,9 @@ struct VkDeviceConfig : public VulkanDeviceConfigExt {
     }
     luisa::span<VKCustomCmd::ResourceUsage const> before_states(uint64_t stream_handle) noexcept override {
         return resource_before_states;
+    }
+    luisa::span<VKCustomCmd::ResourceUsage const> after_states(uint64_t stream_handle) noexcept override {
+        return resource_after_states;
     }
     luisa::vector<luisa::string> extra_device_exts() noexcept {
         return luisa::vector<luisa::string>{"VK_KHR_multiview", "VK_KHR_maintenance2"};

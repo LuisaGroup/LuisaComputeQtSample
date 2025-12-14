@@ -213,7 +213,13 @@ void get_dx_device(
     adaptor_luid = uint2(desc.AdapterLuid.HighPart, desc.AdapterLuid.LowPart);
 }
 
-void set_dx_before_state(
+void clear_dx12_resource_state(luisa::compute::DeviceConfigExt *device_config_ext) {
+    auto ptr = static_cast<DXDeviceConfig *>(device_config_ext);
+    ptr->resource_before_states.clear();
+    ptr->resource_after_states.clear();
+}
+
+void set_dx12_resource_state(
     luisa::compute::DeviceConfigExt *device_config_ext,
     luisa::variant<
         luisa::compute::Argument::Buffer,
@@ -223,6 +229,10 @@ void set_dx_before_state(
     auto ptr = static_cast<DXDeviceConfig *>(device_config_ext);
     ptr->resource_before_states.clear();
     ptr->resource_before_states.emplace_back(
+        resource,
+        (DXCustomCmd::EnhancedResourceUsageType)resource_type);
+    ptr->resource_after_states.clear();
+    ptr->resource_after_states.emplace_back(
         resource,
         (DXCustomCmd::EnhancedResourceUsageType)resource_type);
 }
